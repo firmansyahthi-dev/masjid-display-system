@@ -247,22 +247,7 @@ function DisplayPage() {
         />
       )}
 
-      /* {prayerPhase === 'ADZAN' && activePrayer && (
-        <AdzanDisplay
-          displayConfig={displayConfig}
-          prayerName={activePrayer.name}
-          countdown={countdown}
-        />
-      )}
-
-      {prayerPhase === 'IQAMAH' && activePrayer && (
-        <IqamahDisplay
-          displayConfig={displayConfig}
-          prayerName={activePrayer.name}
-          countdown={countdown}
-        />
-      )} */
-
+      
       {prayerPhase === 'SHOLAT' && activePrayer && (
         <SholatDisplay
           currentTime={currentTime}
