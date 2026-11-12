@@ -7,7 +7,7 @@ interface sholatDisplayProps {
   countdown: string;
 }
 
-function sholatDisplay({ prayerName, countdown }: sholatDisplayProps) {
+function sholatDisplay({ countdown }: sholatDisplayProps) {
   // Hilangkan angka jam jika countdown masih di bawah satu jam.
   const displayCountdown = countdown.startsWith('00:')
     ? countdown.substring(3)
