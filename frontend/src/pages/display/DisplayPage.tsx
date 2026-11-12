@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from 'react';
 import { displayDefaults } from '../../config/displayDefaults';
 import { prayerSchedule } from '../../services/prayerConfig';
 
-import AdzanDisplay from './screens/AdzanDisplay';
+
 import './styles/adzan.css';
 
-import IqamahDisplay from './screens/IqamahDisplay';
+
 import './styles/iqamah.css';
 
 import SholatDisplay from './screens/SholatDisplay';
