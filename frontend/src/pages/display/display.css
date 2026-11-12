@@ -1,0 +1,366 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Amiri:wght@400;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+.display-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  color: #fff;
+
+  background-image: linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.12)),
+    url('/images/mosque-background.jpg');
+
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/* HEADER */
+
+.display-header {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 25% 50% 25%;
+  align-items: center;
+
+  width: 100%;
+  height: 15%;
+  min-height: 90px;
+  flex-shrink: 0;
+
+  padding: 0 1.2vw;
+
+  background: rgba(5, 12, 19, 0.58);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.header-date {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  overflow: hidden;
+}
+
+.header-gregorian {
+  font-size: clamp(14px, 1.7vw, 32px);
+  font-weight: 800;
+  line-height: 1.2;
+  color: #fff;
+  text-transform: capitalize;
+  text-shadow: 1px 2px 4px #000;
+}
+
+.header-hijri {
+  font-size: clamp(12px, 1.35vw, 25px);
+  font-weight: 700;
+  color: #bce4ff;
+  text-shadow: 1px 2px 4px #000;
+}
+
+.header-mosque {
+  text-align: center;
+  min-width: 0;
+}
+
+.header-mosque h1 {
+  margin: 0;
+  color: #e5ec37;
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(23px, 3vw, 56px);
+  font-weight: 800;
+  text-shadow: 2px 3px 5px #000;
+  white-space: nowrap;
+}
+
+.header-mosque p {
+  margin: 5px 0 0;
+  color: #fff;
+  font-size: clamp(11px, 1.2vw, 22px);
+  font-weight: 600;
+  text-shadow: 1px 2px 4px #000;
+}
+
+.header-clock {
+  text-align: right;
+  color: #ff9700;
+  font-size: clamp(30px, 4vw, 76px);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-shadow: 2px 3px 5px #000;
+}
+
+/* AREA FOTO DAN COUNTDOWN */
+
+.display-hero {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 45%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
+  pointer-events: none;
+}
+
+.hero-countdown {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  bottom: 12px;
+
+  min-width: min(42vw, 650px);
+  padding: 10px 3vw;
+
+  background: rgba(20, 20, 20, 0.48);
+  border-left: 4px solid #d3ae51;
+  color: #fff;
+}
+
+.countdown-prayer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  text-shadow: 2px 3px 4px #000;
+}
+
+.countdown-prayer-name {
+  color: #69c878;
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(24px, 3vw, 54px);
+  font-weight: 800;
+}
+
+.countdown-separator {
+  font-size: clamp(23px, 2.5vw, 45px);
+}
+
+.countdown-value {
+  color: #fff;
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(25px, 3vw, 55px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-caption {
+  margin-top: 5px;
+  font-size: clamp(9px, 0.8vw, 15px);
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* JADWAL SHOLAT */
+
+.prayer-schedule-bar {
+  position: relative;
+  z-index: 2;
+
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 5px;
+
+  width: 100%;
+  height: 16%;
+  min-height: 95px;
+  flex-shrink: 0;
+
+  padding: 5px 3px;
+  background: rgba(0, 0, 0, 0.48);
+}
+
+.schedule-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+
+  min-width: 0;
+  overflow: hidden;
+
+  background: rgba(15, 104, 94, 0.91);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-shadow: 2px 2px 4px #000;
+}
+
+.schedule-card:nth-child(2) {
+  background: rgba(165, 63, 38, 0.92);
+}
+
+.schedule-card:nth-child(3) {
+  background: rgba(160, 111, 13, 0.92);
+}
+
+.schedule-card:nth-child(4) {
+  background: rgba(52, 116, 55, 0.92);
+}
+
+.schedule-card:nth-child(5) {
+  background: rgba(102, 37, 119, 0.92);
+}
+
+.schedule-card:nth-child(6) {
+  background: rgba(24, 83, 132, 0.92);
+}
+
+.schedule-card.active {
+  border: 3px solid #fff0a3;
+  filter: brightness(1.2);
+}
+
+.schedule-name {
+  color: #ffe63b;
+  font-family: Bebas Neue, sans-serif;
+  font-size: clamp(15px, 2vw, 37px);
+  font-weight: 900;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.schedule-time {
+  color: #fff;
+  font-size: clamp(23px, 3.5vw, 65px);
+  font-weight: 800;
+  font-family: Bebas Neue, sans-serif;
+
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* RUNNING TEXT */
+
+.display-running-text {
+  position: relative;
+  z-index: 3;
+
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 8%;
+  min-height: 45px;
+  flex-shrink: 0;
+
+  overflow: hidden;
+  background: #000;
+  border-top: 2px solid #d3ae51;
+}
+
+.running-content {
+  display: flex;
+  flex-shrink: 0;
+  width: max-content;
+
+  animation: running-scroll 30s linear infinite;
+  will-change: transform;
+}
+
+.running-group {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+
+  padding-right: 100px;
+  white-space: nowrap;
+}
+
+.running-group span {
+  color: var(--running-text-color, #ffeb00);
+}
+
+@keyframes running-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+  .display-header {
+    grid-template-columns: 25% 48% 27%;
+    padding: 0 1vw;
+  }
+
+  .header-mosque h1 {
+    font-size: clamp(16px, 2.5vw, 25px);
+  }
+
+  .header-clock {
+    font-size: clamp(23px, 3.5vw, 36px);
+  }
+
+  .schedule-name {
+    font-size: clamp(11px, 1.8vw, 18px);
+  }
+
+  .schedule-time {
+    font-size: clamp(19px, 3vw, 30px);
+  }
+}
+
+/* STATUS SHOLAT */
+
+.countdown-caption {
+  transition: opacity 0.3s ease;
+}
+
+.schedule-card.active {
+  border: 3px solid #fff0a3;
+  filter: brightness(1.2);
+  box-shadow: 0 0 12px rgba(255, 230, 120, 0.5);
+}
+
+.prayer-transition-screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.85)),
+    url('/images/mosque-background.jpg') center / cover;
+  color: #ffffff;
+  font-size: clamp(32px, 5vw, 72px);
+  font-weight: 700;
+  text-align: center;
+}
+
+.prayer-transition-screen div {
+  color: #ffca55;
+  font-size: clamp(48px, 8vw, 110px);
+}
