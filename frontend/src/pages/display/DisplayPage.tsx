@@ -247,7 +247,7 @@ function DisplayPage() {
         />
       )}
 
-      {prayerPhase === 'ADZAN' && activePrayer && (
+      /* {prayerPhase === 'ADZAN' && activePrayer && (
         <AdzanDisplay
           displayConfig={displayConfig}
           prayerName={activePrayer.name}
@@ -261,7 +261,7 @@ function DisplayPage() {
           prayerName={activePrayer.name}
           countdown={countdown}
         />
-      )}
+      )} */
 
       {prayerPhase === 'SHOLAT' && activePrayer && (
         <SholatDisplay
