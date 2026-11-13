@@ -81,7 +81,7 @@ function MainDisplay({
             <span className="countdown-value">{countdown}</span>
           </div>
 
-          <div className="countdown-caption">MENUJU WAKTU ADZAN</div>
+          {/* <div className="countdown-caption">MENUJU WAKTU ADZAN</div> */}
         </div>
       </section>
 

@@ -3,14 +3,19 @@ import { useEffect, useRef, useState } from 'react';
 import { displayDefaults } from '../../config/displayDefaults';
 import { prayerSchedule } from '../../services/prayerConfig';
 
-
+import AdzanDisplay from './screens/AdzanDisplay';
 import './styles/adzan.css';
 
-
+import IqamahDisplay from './screens/IqamahDisplay';
 import './styles/iqamah.css';
 
 import SholatDisplay from './screens/SholatDisplay';
 import './styles/sholat.css';
+
+import SyuruqDisplay from './screens/SyuruqDisplay';
+
+import KhutbahDisplay from './screens/KhutbahDisplay';
+import './styles/khutbah.css';
 
 import MainDisplay from './screens/MainDisplay';
 
@@ -19,7 +24,11 @@ import './display.css';
 function DisplayPage() {
   const [currentTime, setCurrentTime] = useState(() => new Date());
 
-  // Status aktivasi suara
+  // Konfigurasi display dan audio
+  const displayConfig = displayDefaults;
+  const audioConfig = displayConfig.audio;
+
+  // Status aktivasi suara oleh pengguna
   const [soundEnabled, setSoundEnabled] = useState(false);
 
   // Pemutar file MP3
@@ -30,26 +39,33 @@ function DisplayPage() {
 
   // Mengaktifkan suara melalui interaksi pengguna
   const handleEnableSound = async () => {
+    if (!audioConfig.enabled) {
+      return;
+    }
+
     try {
       if (!audioRef.current) {
-        audioRef.current = new Audio('/sounds/prayer-beep.mp3');
+        audioRef.current = new Audio(audioConfig.soundUrl);
         audioRef.current.preload = 'auto';
-        audioRef.current.volume = 0.7;
       }
 
       const audio = audioRef.current;
 
-      // Memutar MP3 sekali sebagai tes sekaligus aktivasi audio
+      // Mengatur volume berdasarkan konfigurasi (0-100)
+      audio.volume = Math.min(1, Math.max(0, audioConfig.volume / 100));
+
+      // Memutar MP3 sekali sebagai tes
       audio.currentTime = 0;
       await audio.play();
 
       setSoundEnabled(true);
 
       // Mencegah suara kejadian aktif diputar dua kali
-      if (
-        activePrayerTimestamp !== null &&
-        (prayerPhase === 'ADZAN' || prayerPhase === 'SHOLAT')
-      ) {
+      const currentPhaseEnabled =
+        (prayerPhase === 'ADZAN' && audioConfig.adzanEnabled) ||
+        (prayerPhase === 'SHOLAT' && audioConfig.iqamahEnabled);
+
+      if (activePrayerTimestamp !== null && currentPhaseEnabled) {
         lastBeepKey.current = `${activePrayerTimestamp}-${prayerPhase}`;
       }
     } catch (error) {
@@ -62,9 +78,11 @@ function DisplayPage() {
   const playBeep = () => {
     const audio = audioRef.current;
 
-    if (!audio || !soundEnabled) {
+    if (!audio || !soundEnabled || !audioConfig.enabled) {
       return;
     }
+
+    audio.volume = Math.min(1, Math.max(0, audioConfig.volume / 100));
 
     audio.pause();
     audio.currentTime = 0;
@@ -73,8 +91,6 @@ function DisplayPage() {
       console.error('Gagal memutar MP3:', error);
     });
   };
-
-  const displayConfig = displayDefaults;
 
   // Memperbarui waktu setiap detik
   useEffect(() => {
@@ -87,9 +103,57 @@ function DisplayPage() {
 
   const prayerTimes = prayerSchedule.prayers;
 
+  // Mengambil jadwal Syuruq
+  const syuruqPrayer = prayerTimes.find(
+    (prayer) => prayer.name.toUpperCase() === 'SYURUQ'
+  );
+
+  // Menentukan waktu mulai dan akhir Syuruq hari ini
+  const syuruqStart = syuruqPrayer
+    ? (() => {
+        const [hours, minutes] = syuruqPrayer.time.split(':').map(Number);
+
+        const date = new Date(currentTime);
+        date.setHours(hours, minutes, 0, 0);
+
+        return date;
+      })()
+    : null;
+
+  // Waktu larangan sholat sunnah berakhir 15 menit setelah Syuruq
+  const syuruqEnd = syuruqStart
+    ? new Date(syuruqStart.getTime() + 15 * 60 * 1000)
+    : null;
+
+  // Memeriksa apakah sedang dalam waktu larangan setelah Syuruq
+  const isSyuruqActive =
+    syuruqStart !== null &&
+    syuruqEnd !== null &&
+    currentTime >= syuruqStart &&
+    currentTime < syuruqEnd;
+
+  // Countdown sisa waktu larangan Syuruq
+  const syuruqRemainingSeconds =
+    syuruqEnd !== null
+      ? Math.max(
+          0,
+          Math.ceil((syuruqEnd.getTime() - currentTime.getTime()) / 1000)
+        )
+      : 0;
+
+  // Format waktu akhir Syuruq HH:MM
+  const syuruqEndTime = syuruqEnd
+    ? `${String(syuruqEnd.getHours()).padStart(2, '0')}:${String(
+        syuruqEnd.getMinutes()
+      ).padStart(2, '0')}`
+    : '--:--';
+
   // Durasi tampilan dalam detik
   const ADZAN_DURATION_SECONDS = 1 * 60;
   const SHOLAT_DURATION_SECONDS = 1 * 30;
+
+  // Durasi Khutbah Jumat: 45 menit
+  const KHUTBAH_DURATION_SECONDS = 45 * 60;
 
   // Membuat jadwal sholat untuk hari ini dan kemarin
   const prayerEvents = [-1, 0].flatMap((dayOffset) =>
@@ -118,15 +182,22 @@ function DisplayPage() {
         (currentTime.getTime() - prayer.prayerDate.getTime()) / 1000
       );
 
-      const totalDuration =
-        ADZAN_DURATION_SECONDS + prayer.iqamahSeconds + SHOLAT_DURATION_SECONDS;
+      const isFridayDhuhr =
+        prayer.prayerDate.getDay() === 5 &&
+        prayer.name.toUpperCase() === 'DZUHUR';
+
+      const totalDuration = isFridayDhuhr
+        ? ADZAN_DURATION_SECONDS + KHUTBAH_DURATION_SECONDS
+        : ADZAN_DURATION_SECONDS +
+          prayer.iqamahSeconds +
+          SHOLAT_DURATION_SECONDS;
 
       return elapsedSeconds >= 0 && elapsedSeconds < totalDuration;
     })
     .sort((a, b) => b.prayerDate.getTime() - a.prayerDate.getTime())[0];
 
   // Menentukan tahap sholat
-  let prayerPhase: 'IDLE' | 'ADZAN' | 'IQAMAH' | 'SHOLAT' = 'IDLE';
+  let prayerPhase: 'IDLE' | 'ADZAN' | 'IQAMAH' | 'SHOLAT' | 'KHUTBAH' = 'IDLE';
 
   let phaseRemainingSeconds = 0;
 
@@ -135,13 +206,31 @@ function DisplayPage() {
       (currentTime.getTime() - activePrayer.prayerDate.getTime()) / 1000
     );
 
+    const isFridayDhuhr =
+      activePrayer.prayerDate.getDay() === 5 &&
+      activePrayer.name.toUpperCase() === 'DZUHUR';
+
     const iqamahEnd = ADZAN_DURATION_SECONDS + activePrayer.iqamahSeconds;
 
-    if (elapsedSeconds < ADZAN_DURATION_SECONDS) {
+    if (isFridayDhuhr) {
+      const khutbahEnd = ADZAN_DURATION_SECONDS + KHUTBAH_DURATION_SECONDS;
+
+      if (elapsedSeconds < ADZAN_DURATION_SECONDS) {
+        prayerPhase = 'ADZAN';
+
+        phaseRemainingSeconds = ADZAN_DURATION_SECONDS - elapsedSeconds;
+      } else {
+        prayerPhase = 'KHUTBAH';
+
+        phaseRemainingSeconds = khutbahEnd - elapsedSeconds;
+      }
+    } else if (elapsedSeconds < ADZAN_DURATION_SECONDS) {
       prayerPhase = 'ADZAN';
+
       phaseRemainingSeconds = ADZAN_DURATION_SECONDS - elapsedSeconds;
     } else if (elapsedSeconds < iqamahEnd) {
       prayerPhase = 'IQAMAH';
+
       phaseRemainingSeconds = iqamahEnd - elapsedSeconds;
     } else {
       prayerPhase = 'SHOLAT';
@@ -195,13 +284,23 @@ function DisplayPage() {
   // Identitas waktu sholat yang sedang aktif
   const activePrayerTimestamp = activePrayer?.prayerDate.getTime() ?? null;
 
-  // Memutar MP3 otomatis saat memasuki fase Adzan atau Sholat
+  // Memutar MP3 otomatis saat memasuki fase yang diaktifkan
   useEffect(() => {
-    if (!soundEnabled || !activePrayer || activePrayerTimestamp === null) {
+    if (
+      !audioConfig.enabled ||
+      !soundEnabled ||
+      !activePrayer ||
+      activePrayerTimestamp === null
+    ) {
       return;
     }
 
-    if (prayerPhase !== 'ADZAN' && prayerPhase !== 'SHOLAT') {
+    // Memeriksa apakah suara untuk fase ini diaktifkan
+    const phaseAudioEnabled =
+      (prayerPhase === 'ADZAN' && audioConfig.adzanEnabled) ||
+      (prayerPhase === 'SHOLAT' && audioConfig.iqamahEnabled);
+
+    if (!phaseAudioEnabled) {
       return;
     }
 
@@ -215,12 +314,20 @@ function DisplayPage() {
     lastBeepKey.current = beepKey;
 
     playBeep();
-  }, [prayerPhase, activePrayerTimestamp, soundEnabled]);
+  }, [
+    prayerPhase,
+    activePrayerTimestamp,
+    soundEnabled,
+    audioConfig.enabled,
+    audioConfig.adzanEnabled,
+    audioConfig.iqamahEnabled,
+  ]);
 
   return (
     <>
       <button
         onClick={handleEnableSound}
+        disabled={!audioConfig.enabled}
         style={{
           position: 'fixed',
           top: '12px',
@@ -229,16 +336,34 @@ function DisplayPage() {
           padding: '10px 18px',
           borderRadius: '8px',
           border: '1px solid #d6b65b',
-          background: soundEnabled ? '#176b3a' : '#b8860b',
+          background: !audioConfig.enabled
+            ? '#555'
+            : soundEnabled
+            ? '#176b3a'
+            : '#b8860b',
           color: '#fff',
           fontWeight: 600,
-          cursor: 'pointer',
+          cursor: audioConfig.enabled ? 'pointer' : 'not-allowed',
         }}
       >
-        {soundEnabled ? '🔊 Suara Aktif' : '🔇 Aktifkan Suara'}
+        {!audioConfig.enabled
+          ? '🔇 Suara Dinonaktifkan'
+          : soundEnabled
+          ? '🔊 Suara Aktif'
+          : '🔇 Aktifkan Suara'}
       </button>
 
-      {prayerPhase === 'IDLE' && (
+      {/* Tampilan Syuruq selama 15 menit */}
+      {isSyuruqActive && (
+        <SyuruqDisplay
+          syuruqTime={syuruqPrayer?.time ?? '--:--'}
+          forbiddenEndTime={syuruqEndTime}
+          remainingSeconds={syuruqRemainingSeconds}
+        />
+      )}
+
+      {/* Tampilan utama ketika tidak ada fase sholat atau Syuruq */}
+      {prayerPhase === 'IDLE' && !isSyuruqActive && (
         <MainDisplay
           currentTime={currentTime}
           displayConfig={displayConfig}
@@ -247,7 +372,28 @@ function DisplayPage() {
         />
       )}
 
-      
+      {prayerPhase === 'ADZAN' && activePrayer && (
+        <AdzanDisplay
+          currentTime={currentTime}
+          displayConfig={displayConfig}
+          prayerName={activePrayer.name}
+          countdown={countdown}
+        />
+      )}
+
+      {prayerPhase === 'KHUTBAH' && activePrayer && (
+        <KhutbahDisplay displayConfig={displayConfig} countdown={countdown} />
+      )}
+
+      {prayerPhase === 'IQAMAH' && activePrayer && (
+        <IqamahDisplay
+          currentTime={currentTime}
+          displayConfig={displayConfig}
+          prayerName={activePrayer.name}
+          countdown={countdown}
+        />
+      )}
+
       {prayerPhase === 'SHOLAT' && activePrayer && (
         <SholatDisplay
           currentTime={currentTime}

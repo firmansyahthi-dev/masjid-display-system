@@ -4,7 +4,7 @@ export const displayDefaults: DisplayConfig = {
   tenantId: 'demo-masjid',
 
   mosqueName: 'MASJID AL BARKAH',
-  mosqueAddress: 'Jl. Merpati Raya No. 10, Pamulang, Tanggerang Selatan',
+  mosqueAddress: 'Jl. Merpati Raya No. 10, Pamulang, Tangerang Selatan',
 
   logoUrl: null,
   backgroundUrl: '/images/mosque-background.jpg',
@@ -17,6 +17,7 @@ export const displayDefaults: DisplayConfig = {
   theme: {
     headerBackground: 'rgba(5, 12, 19, 0.58)',
     clockColor: '#ff9700',
+
     scheduleColors: [
       '#0f685e',
       '#a53f26',
@@ -25,7 +26,8 @@ export const displayDefaults: DisplayConfig = {
       '#662577',
       '#185384',
     ],
-    runningTextColor: '#ffffff',
+
+    runningTextColor: '#d3ae51',
   },
 
   settings: {
@@ -35,5 +37,13 @@ export const displayDefaults: DisplayConfig = {
     showCountdown: true,
     showPrayerSchedule: true,
     showRunningText: true,
+  },
+
+  audio: {
+    enabled: true,
+    adzanEnabled: true,
+    iqamahEnabled: true,
+    volume: 70,
+    soundUrl: '/sounds/prayer-beep.mp3',
   },
 };
