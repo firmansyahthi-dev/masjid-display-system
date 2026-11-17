@@ -1,11 +1,16 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import './config/database.js';
+import tenantRoutes from './routes/tenantRoutes.js';
+import displayRoutes from './routes/displayRoutes.js';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use('/api/tenants', tenantRoutes);
+app.use('/api/display', displayRoutes);
 
 // API Health Check
 app.get('/api/health', (req, res) => {

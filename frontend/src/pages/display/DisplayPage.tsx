@@ -1,3 +1,5 @@
+import type { DisplayConfig } from '../../types/display';
+import { getDisplayConfig } from '../../services/displayService';
 import { useEffect, useRef, useState } from 'react';
 
 import { displayDefaults } from '../../config/displayDefaults';
@@ -24,9 +26,40 @@ import './display.css';
 function DisplayPage() {
   const [currentTime, setCurrentTime] = useState(() => new Date());
 
-  // Konfigurasi display dan audio
-  const displayConfig = displayDefaults;
-  const audioConfig = displayConfig.audio;
+ // Konfigurasi Display
+const [displayConfig, setDisplayConfig] =
+useState<DisplayConfig>(displayDefaults);
+
+const audioConfig = displayConfig.audio;
+
+// Mengambil konfigurasi Display dari backend
+useEffect(() => {
+  let isMounted = true;
+
+  const loadDisplayConfig = async () => {
+    try {
+      const config = await getDisplayConfig(
+        displayDefaults.tenantId
+      );
+
+      if (isMounted) {
+        setDisplayConfig(config);
+        console.log('Konfigurasi Display berhasil dimuat:', config);
+      }
+    } catch (error) {
+      console.error(
+        'Gagal mengambil konfigurasi Display. Menggunakan default:',
+        error
+      );
+    }
+  };
+
+  loadDisplayConfig();
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
 
   // Status aktivasi suara oleh pengguna
   const [soundEnabled, setSoundEnabled] = useState(false);

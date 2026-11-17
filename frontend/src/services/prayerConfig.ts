@@ -6,36 +6,36 @@ export const prayerSchedule: PrayerSchedule = {
   prayers: [
     {
       name: 'SUBUH',
-      time: '04:03',
+      time: '05:11',
       iqamah: 10,
       isPrayer: true,
     },
     {
       name: 'SYURUQ',
-      time: '05:25',
+      time: '05:58',
       isPrayer: false,
     },
     {
       name: 'DZUHUR',
-      time: '11:37',
+      time: '12:14',
       iqamah: 10,
       isPrayer: true,
     },
     {
       name: 'ASHAR',
-      time: '14:58',
+      time: '14:52',
       iqamah: 10,
       isPrayer: true,
     },
     {
       name: 'MAGHRIB',
-      time: '17:49',
+      time: '18:00',
       iqamah: 10,
       isPrayer: true,
     },
     {
       name: 'ISYA',
-      time: '19:02',
+      time: '22:37',
       iqamah: 10,
       isPrayer: true,
     },
