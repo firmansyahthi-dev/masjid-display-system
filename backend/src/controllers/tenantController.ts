@@ -1,6 +1,6 @@
-
 import type { Request, Response } from 'express';
 import db from '../config/database.js';
+import { getSingleRouteParam } from '../utils/routeParams.js';
 
 // Mengambil seluruh data masjid
 export function getTenants(_req: Request, res: Response) {
@@ -48,7 +48,14 @@ export function getTenants(_req: Request, res: Response) {
 // Mengambil detail satu masjid
 export function getTenantById(req: Request, res: Response) {
   try {
-    const { tenantId } = req.params;
+    const tenantId = getSingleRouteParam(req.params.tenantId);
+
+    if (!tenantId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tenant ID tidak valid',
+      });
+    }
 
     const result = db.exec(
       `

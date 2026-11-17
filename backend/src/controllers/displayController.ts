@@ -1,10 +1,17 @@
 import type { Request, Response } from 'express';
 import db, { saveDatabase } from '../config/database.js';
+import { getSingleRouteParam } from '../utils/routeParams.js';
 
 export function getDisplayConfig(req: Request, res: Response) {
   try {
-    const { tenantId } = req.params;
+    const tenantId = getSingleRouteParam(req.params.tenantId);
 
+    if (!tenantId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tenant ID tidak valid',
+      });
+    }
     const result = db.exec(
       `
         SELECT
@@ -83,7 +90,15 @@ export function getDisplayConfig(req: Request, res: Response) {
 
 export function updateDisplayConfig(req: Request, res: Response) {
   try {
-    const { tenantId } = req.params;
+    const tenantId = getSingleRouteParam(req.params.tenantId);
+
+    if (!tenantId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tenant ID tidak valid',
+      });
+    }
+
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const has = (key: string) =>
